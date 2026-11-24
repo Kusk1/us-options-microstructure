@@ -1,0 +1,14 @@
+[project]
+name = "us-options-microstructure-monitor"
+version = "1.0.0"
+description = "US Equity Options Microstructure & Liquidity Stampede Monitor powered by OpenBB"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "openbb==4.7.2",
+    "pandas>=2.2.0",
+    "numpy>=1.26.0",
+    "requests>=2.31.0",
+]
+
+[tool.uv]
+package = false

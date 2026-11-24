@@ -1,0 +1,96 @@
+name: Daily OpenBB Options Microstructure Update
+
+on:
+  schedule:
+    # 周一至周五美股收盘后自动运行（UTC 22:30 = 美东夏令时 18:30 / 冬令时 17:30 = 北京时间次日 06:30）
+    - cron: "30 22 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      backfill_days:
+        description: "历史回填交易日数（默认增量 5 天，首次可填 90）"
+        required: false
+        default: "10"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "options-microstructure-daily"
+  cancel-in-progress: false
+
+jobs:
+  fetch-and-update:
+    name: Fetch OpenBB & CBOE Data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python 3.12 and install dependencies
+        run: |
+          uv python install 3.12
+          uv sync --python 3.12
+
+      - name: Run OpenBB daily data collector
+        env:
+          OPENBB_AUTO_BUILD: "true"
+        run: |
+          BACKFILL="${{ github.event.inputs.backfill_days || '10' }}"
+          uv run python scripts/fetch_data.py --backfill-days "$BACKFILL"
+
+      - name: Validate generated JSON files
+        run: |
+          uv run python -c "
+          import json, pathlib
+          latest = json.loads(pathlib.Path('docs/data/latest.json').read_text(encoding='utf-8'))
+          hist = json.loads(pathlib.Path('docs/data/history.json').read_text(encoding='utf-8'))
+          assert latest.get('asOfDate'), 'Missing asOfDate in latest.json'
+          assert hist.get('count', 0) > 0, 'Empty history.json'
+          print(f\"Validated latest.json (asOf={latest['asOfDate']}, stress={latest['stressScore']}) and history.json ({hist['count']} days)\")
+          "
+
+      - name: Commit and push updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/latest.json docs/data/history.json
+          if git diff --staged --quiet; then
+            echo "No data changes to commit."
+          else
+            AS_OF=$(uv run python -c "import json; print(json.load(open('docs/data/latest.json'))['asOfDate'])")
+            git commit -m "chore(data): daily OpenBB microstructure update (${AS_OF})"
+            git push
+          fi
+
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    needs: fetch-and-update
+    if: always() && (needs.fetch-and-update.result == 'success')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout latest main
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload docs artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "docs"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

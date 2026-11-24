@@ -1,0 +1,427 @@
+{
+  "schemaVersion": "1.0.0",
+  "asOfDate": "2026-11-23",
+  "fetchedAtUtc": "2026-11-24T12:26:14Z",
+  "spxSpot": 7237.17,
+  "stressScore": 60,
+  "stressPartial": false,
+  "regime": {
+    "stage": 3,
+    "title": "阶段三：负反馈翻转与 Vanna 踩踏加速期",
+    "color": "red",
+    "macroDefense": false
+  },
+  "values": {
+    "vixeqVix": 1.84,
+    "dspx": 40.97,
+    "nvda": 165.05,
+    "vix": 26.62,
+    "vvix": 117.36,
+    "vixVxv": 1.044,
+    "vix9dVix": 1.043,
+    "skew": 140.37,
+    "pcEquity": 0.55,
+    "pcTotal": 0.94,
+    "pcIndex": 1.21,
+    "spxGex": -61.26,
+    "dealerGamma": -8.47,
+    "netDelta": -25.92
+  },
+  "aux": {
+    "vixeq": 49.09,
+    "vix9d": 27.76,
+    "vix3m": 25.5,
+    "spx": 7237.17,
+    "gammaFlip": 7396.3,
+    "callWall": 7400,
+    "putWall": 7000,
+    "callGex": 119.44,
+    "putGex": -180.7,
+    "gexPer1PtM": -846.5,
+    "validContracts": 17992,
+    "totalContracts": 21841
+  },
+  "strikeProfile": [
+    {
+      "strike": 6725,
+      "callGex": 0.0,
+      "putGex": -0.0,
+      "netGex": -0.0
+    },
+    {
+      "strike": 6750,
+      "callGex": 0.1,
+      "putGex": -1.43,
+      "netGex": -1.33
+    },
+    {
+      "strike": 6775,
+      "callGex": 0.04,
+      "putGex": -0.67,
+      "netGex": -0.63
+    },
+    {
+      "strike": 6800,
+      "callGex": 0.25,
+      "putGex": -2.73,
+      "netGex": -2.47
+    },
+    {
+      "strike": 6825,
+      "callGex": 0.04,
+      "putGex": -0.42,
+      "netGex": -0.38
+    },
+    {
+      "strike": 6850,
+      "callGex": 0.82,
+      "putGex": -1.29,
+      "netGex": -0.47
+    },
+    {
+      "strike": 6875,
+      "callGex": 0.42,
+      "putGex": -0.65,
+      "netGex": -0.23
+    },
+    {
+      "strike": 6900,
+      "callGex": 0.93,
+      "putGex": -2.57,
+      "netGex": -1.64
+    },
+    {
+      "strike": 6925,
+      "callGex": 0.39,
+      "putGex": -1.32,
+      "netGex": -0.92
+    },
+    {
+      "strike": 6950,
+      "callGex": 0.62,
+      "putGex": -2.11,
+      "netGex": -1.48
+    },
+    {
+      "strike": 6975,
+      "callGex": 0.25,
+      "putGex": -1.45,
+      "netGex": -1.2
+    },
+    {
+      "strike": 7000,
+      "callGex": 13.26,
+      "putGex": -30.21,
+      "netGex": -16.96
+    },
+    {
+      "strike": 7025,
+      "callGex": 0.22,
+      "putGex": -1.43,
+      "netGex": -1.21
+    },
+    {
+      "strike": 7050,
+      "callGex": 0.41,
+      "putGex": -2.33,
+      "netGex": -1.92
+    },
+    {
+      "strike": 7075,
+      "callGex": 0.28,
+      "putGex": -1.82,
+      "netGex": -1.54
+    },
+    {
+      "strike": 7100,
+      "callGex": 1.55,
+      "putGex": -3.76,
+      "netGex": -2.21
+    },
+    {
+      "strike": 7125,
+      "callGex": 0.55,
+      "putGex": -1.92,
+      "netGex": -1.38
+    },
+    {
+      "strike": 7150,
+      "callGex": 1.34,
+      "putGex": -3.59,
+      "netGex": -2.25
+    },
+    {
+      "strike": 7175,
+      "callGex": 0.95,
+      "putGex": -2.62,
+      "netGex": -1.68
+    },
+    {
+      "strike": 7200,
+      "callGex": 2.6,
+      "putGex": -4.64,
+      "netGex": -2.03
+    },
+    {
+      "strike": 7225,
+      "callGex": 2.61,
+      "putGex": -2.17,
+      "netGex": 0.44
+    },
+    {
+      "strike": 7250,
+      "callGex": 5.41,
+      "putGex": -5.87,
+      "netGex": -0.45
+    },
+    {
+      "strike": 7275,
+      "callGex": 2.98,
+      "putGex": -2.6,
+      "netGex": 0.38
+    },
+    {
+      "strike": 7300,
+      "callGex": 5.3,
+      "putGex": -5.9,
+      "netGex": -0.6
+    },
+    {
+      "strike": 7325,
+      "callGex": 2.58,
+      "putGex": -2.9,
+      "netGex": -0.32
+    },
+    {
+      "strike": 7350,
+      "callGex": 4.41,
+      "putGex": -3.41,
+      "netGex": 1.01
+    },
+    {
+      "strike": 7375,
+      "callGex": 1.6,
+      "putGex": -2.04,
+      "netGex": -0.44
+    },
+    {
+      "strike": 7400,
+      "callGex": 5.89,
+      "putGex": -6.53,
+      "netGex": -0.65
+    },
+    {
+      "strike": 7425,
+      "callGex": 1.1,
+      "putGex": -1.8,
+      "netGex": -0.7
+    },
+    {
+      "strike": 7450,
+      "callGex": 1.79,
+      "putGex": -3.3,
+      "netGex": -1.51
+    },
+    {
+      "strike": 7475,
+      "callGex": 1.23,
+      "putGex": -1.11,
+      "netGex": 0.12
+    },
+    {
+      "strike": 7500,
+      "callGex": 3.41,
+      "putGex": -4.5,
+      "netGex": -1.09
+    },
+    {
+      "strike": 7525,
+      "callGex": 1.39,
+      "putGex": -1.63,
+      "netGex": -0.24
+    },
+    {
+      "strike": 7550,
+      "callGex": 1.57,
+      "putGex": -2.36,
+      "netGex": -0.79
+    },
+    {
+      "strike": 7575,
+      "callGex": 1.02,
+      "putGex": -0.93,
+      "netGex": 0.08
+    },
+    {
+      "strike": 7600,
+      "callGex": 3.92,
+      "putGex": -5.13,
+      "netGex": -1.21
+    },
+    {
+      "strike": 7625,
+      "callGex": 1.46,
+      "putGex": -1.02,
+      "netGex": 0.45
+    },
+    {
+      "strike": 7650,
+      "callGex": 2.0,
+      "putGex": -2.48,
+      "netGex": -0.48
+    },
+    {
+      "strike": 7675,
+      "callGex": 1.28,
+      "putGex": -1.38,
+      "netGex": -0.1
+    },
+    {
+      "strike": 7700,
+      "callGex": 2.56,
+      "putGex": -5.49,
+      "netGex": -2.93
+    },
+    {
+      "strike": 7725,
+      "callGex": 1.0,
+      "putGex": -1.45,
+      "netGex": -0.45
+    },
+    {
+      "strike": 7750,
+      "callGex": 0.09,
+      "putGex": -0.32,
+      "netGex": -0.23
+    }
+  ],
+  "provenance": {
+    "vixeqVix": {
+      "value": 1.84,
+      "unit": "x",
+      "obsDate": "2026-11-23",
+      "source": "派生：CBOE VIXEQ ÷ OpenBB ^VIX",
+      "kind": "derived",
+      "status": "ok",
+      "note": "VIXEQ=49.09 / VIX=26.62"
+    },
+    "dspx": {
+      "value": 40.97,
+      "unit": "点",
+      "obsDate": "2026-11-23",
+      "source": "CBOE Official CSV (DSPX)",
+      "kind": "official",
+      "status": "ok",
+      "note": "Cboe S&P 500 30日离散度指数"
+    },
+    "nvda": {
+      "value": 165.05,
+      "unit": "USD",
+      "obsDate": "2026-11-23",
+      "source": "OpenBB (NVDA via yfinance)",
+      "kind": "official",
+      "status": "ok",
+      "note": "权重科技龙头风向标收盘价"
+    },
+    "vix": {
+      "value": 26.62,
+      "unit": "点",
+      "obsDate": "2026-11-23",
+      "source": "OpenBB (^VIX via yfinance)",
+      "kind": "official",
+      "status": "ok",
+      "note": "30天基准恐慌指数收盘值"
+    },
+    "vvix": {
+      "value": 117.36,
+      "unit": "点",
+      "obsDate": "2026-11-23",
+      "source": "OpenBB (^VVIX via yfinance)",
+      "kind": "official",
+      "status": "ok",
+      "note": "VIX 期权隐含波动率（波动率的波动率）"
+    },
+    "vixVxv": {
+      "value": 1.044,
+      "unit": "x",
+      "obsDate": "2026-11-23",
+      "source": "派生：OpenBB ^VIX ÷ ^VIX3M (VXV)",
+      "kind": "derived",
+      "status": "ok",
+      "note": "VIX=26.62 / VIX3M=25.5"
+    },
+    "vix9dVix": {
+      "value": 1.043,
+      "unit": "x",
+      "obsDate": "2026-11-23",
+      "source": "派生：OpenBB ^VIX9D ÷ ^VIX",
+      "kind": "derived",
+      "status": "ok",
+      "note": "VIX9D=27.76 / VIX=26.62"
+    },
+    "skew": {
+      "value": 140.37,
+      "unit": "点",
+      "obsDate": "2026-11-23",
+      "source": "OpenBB (^SKEW via yfinance)",
+      "kind": "official",
+      "status": "ok",
+      "note": "CBOE 标普尾部风险偏度指数"
+    },
+    "pcEquity": {
+      "value": 0.55,
+      "unit": "比值",
+      "obsDate": "2026-11-23",
+      "source": "CBOE Daily Market Statistics JSON",
+      "kind": "official",
+      "status": "ok",
+      "note": "官方个股 Put/Call 成交量比"
+    },
+    "pcTotal": {
+      "value": 0.94,
+      "unit": "比值",
+      "obsDate": "2026-11-23",
+      "source": "CBOE Daily Market Statistics JSON",
+      "kind": "official",
+      "status": "ok",
+      "note": "官方全市场汇总 Put/Call 成交量比"
+    },
+    "pcIndex": {
+      "value": 1.21,
+      "unit": "比值",
+      "obsDate": "2026-11-23",
+      "source": "CBOE Daily Market Statistics JSON",
+      "kind": "official",
+      "status": "ok",
+      "note": "官方指数 Put/Call 成交量比"
+    },
+    "spxGex": {
+      "value": -61.26,
+      "unit": "$B / 1%变动",
+      "obsDate": "2026-11-23",
+      "source": "OpenBB ^SPX 期权链 → Black-Scholes 自算",
+      "kind": "model_estimate",
+      "status": "ok",
+      "note": "标准做市商假设（Call +OI / Put -OI），非付费订单流口径"
+    },
+    "dealerGamma": {
+      "value": -8.47,
+      "unit": "$B / 10点变动",
+      "obsDate": "2026-11-23",
+      "source": "OpenBB ^SPX 期权链 → Black-Scholes 自算",
+      "kind": "model_estimate",
+      "status": "ok",
+      "note": "每 10 点 SPX 变动的做市商 Gamma 美元敞口估算"
+    },
+    "netDelta": {
+      "value": -25.92,
+      "unit": "$B 名义流",
+      "obsDate": "2026-11-23",
+      "source": "OpenBB ^SPX 期权链 → 当日成交量加权 Delta 流",
+      "kind": "model_estimate",
+      "status": "ok",
+      "note": "按当日 Call/Put 成交量 × Delta × 100 × Spot 估算"
+    }
+  },
+  "gaps": []
+}

@@ -44,6 +44,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT_DIR / "docs" / "data"
 LATEST_PATH = DATA_DIR / "latest.json"
 HISTORY_PATH = DATA_DIR / "history.json"
+JOURNAL_PATH = DATA_DIR / "journal.json"
 
 HTTP_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
@@ -506,6 +507,247 @@ def detect_regime(v: dict[str, float | None]) -> dict[str, Any]:
     }
 
 
+def evaluate_red_lines(rec: dict[str, Any]) -> list[str]:
+    """返回当日触发红线的指标名称列表（缺失项不判定）。"""
+    triggered: list[str] = []
+    vix = rec.get("vix")
+    vvix = rec.get("vvix")
+    vix_vxv = rec.get("vixVxv")
+    vix9d_vix = rec.get("vix9dVix")
+    vixeq_vix = rec.get("vixeqVix")
+    skew = rec.get("skew")
+    pc_eq = rec.get("pcEquity")
+    pc_tot = rec.get("pcTotal")
+    pc_idx = rec.get("pcIndex")
+    spx_gex = rec.get("spxGex")
+    dealer_g = rec.get("dealerGamma")
+    net_delta = rec.get("netDelta")
+
+    if vix is not None and vix >= 28.0:
+        triggered.append("VIX破28(Vanna触发)")
+    if vvix is not None and vvix >= 115.0:
+        triggered.append("VVIX破115(流动性挤兑)")
+    if vix_vxv is not None and vix_vxv > 1.00:
+        triggered.append("VIX/VIX3M期限倒挂")
+    if vix9d_vix is not None and vix9d_vix > 1.00:
+        triggered.append("VIX9D/VIX超短端倒挂")
+    if vixeq_vix is not None and vixeq_vix < 1.85:
+        triggered.append("VIXEQ/VIX跌破1.85(离散崩塌)")
+    if skew is not None and skew >= 160.0:
+        triggered.append("SKEW冲上160(尾部险抢筹)")
+    if pc_eq is not None and pc_eq >= 0.80:
+        triggered.append("个股P/C破0.80")
+    if pc_tot is not None and pc_tot >= 1.25:
+        triggered.append("全市场P/C破1.25")
+    if pc_idx is not None and pc_idx >= 1.25:
+        triggered.append("指数P/C破1.25(宏观防御)")
+    if spx_gex is not None and spx_gex <= -50.0:
+        triggered.append("SPX GEX深度负值")
+    if dealer_g is not None:
+        if dealer_g <= -8.6:
+            triggered.append("Dealer Gamma击穿-8.6B底线")
+        elif dealer_g <= -5.0:
+            triggered.append("Dealer Gamma深度负值")
+    if net_delta is not None and net_delta <= -20.0:
+        triggered.append("Net Delta持续卖出对冲")
+    return triggered
+
+
+def build_journal_entries(history_records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """
+    基于按时间升序排列的 history_records，为每一天生成确定性、可追溯的中文自动判断记录，
+    并自动回填后续 +1 日与 +5 日标普 500 实际涨跌幅用于事后复盘验证。
+    返回按日期倒序排列的日志列表（最新一天在最前）。
+    """
+    stage_short = {1: "阶段一", 2: "阶段二", 3: "阶段三", 4: "阶段四"}
+    entries_asc: list[dict[str, Any]] = []
+    streak = 0
+    prev_red_set: set[str] = set()
+
+    n = len(history_records)
+    for i, rec in enumerate(history_records):
+        prev = history_records[i - 1] if i > 0 else None
+        regime = detect_regime(rec)
+        stage = regime["stage"]
+        prev_stage = prev.get("stage") if prev else None
+        stage_changed = prev_stage is not None and prev_stage != stage
+        streak = 1 if (prev_stage is None or stage_changed) else (streak + 1)
+
+        stress = rec.get("stressScore")
+        prev_stress = prev.get("stressScore") if prev else None
+        stress_delta = (
+            int(stress - prev_stress)
+            if (stress is not None and prev_stress is not None)
+            else None
+        )
+
+        spx = rec.get("spx")
+        prev_spx = prev.get("spx") if prev else None
+        spx_chg_pct = (
+            round(((spx / prev_spx) - 1.0) * 100.0, 2)
+            if (spx is not None and prev_spx is not None and prev_spx != 0)
+            else None
+        )
+
+        # 事后验证：+1D 与 +5D 标普实际涨跌幅
+        spx_ret_1d = None
+        if spx and i + 1 < n and history_records[i + 1].get("spx"):
+            spx_ret_1d = round(((history_records[i + 1]["spx"] / spx) - 1.0) * 100.0, 2)
+        spx_ret_5d = None
+        if spx and i + 5 < n and history_records[i + 5].get("spx"):
+            spx_ret_5d = round(((history_records[i + 5]["spx"] / spx) - 1.0) * 100.0, 2)
+
+        red_lines = evaluate_red_lines(rec)
+        red_set = set(red_lines)
+        newly_triggered = sorted(red_set - prev_red_set) if prev else []
+        cleared_lines = sorted(prev_red_set - red_set) if prev else []
+        prev_red_set = red_set
+
+        # 1) 一句话标题判断（Headline）
+        delta_txt = ""
+        if stress_delta is not None:
+            sign = "+" if stress_delta > 0 else ""
+            delta_txt = f"（较前日 {sign}{stress_delta}）"
+        score_txt = f"{stress}/100{delta_txt}" if stress is not None else "待评估"
+
+        if stage_changed:
+            direction = "升级至" if stage > prev_stage else "回落/切换至"
+            headline = (
+                f"阶段拐点：由{stage_short.get(prev_stage, '')}{direction}「{regime['title']}」，"
+                f"综合压力 {score_txt}。"
+            )
+        else:
+            headline = (
+                f"连续第 {streak} 个交易日处于「{regime['title']}」，"
+                f"综合压力 {score_txt}。"
+            )
+
+        # 2) 当日核心事实与驱动（Drivers）
+        drivers: list[str] = []
+        vix = rec.get("vix")
+        vvix = rec.get("vvix")
+        vix_vxv = rec.get("vixVxv")
+        vix9d_vix = rec.get("vix9dVix")
+        vixeq_vix = rec.get("vixeqVix")
+        dspx = rec.get("dspx")
+        pc_eq = rec.get("pcEquity")
+        pc_tot = rec.get("pcTotal")
+        pc_idx = rec.get("pcIndex")
+        spx_gex = rec.get("spxGex")
+        dealer_g = rec.get("dealerGamma")
+        net_delta = rec.get("netDelta")
+        gamma_flip = rec.get("gammaFlip")
+
+        if vix is not None:
+            term_desc = (
+                f"VIX/VIX3M={vix_vxv:.2f}（{'近远端倒挂' if vix_vxv > 1.0 else '正常升水'}）"
+                if vix_vxv is not None
+                else "期限比缺失"
+            )
+            vvix_desc = f"VVIX {vvix:.1f}" if vvix is not None else "VVIX 缺失"
+            drivers.append(f"波动率与期限：VIX {vix:.2f}、{vvix_desc}，{term_desc}。")
+
+        if vixeq_vix is not None or pc_idx is not None:
+            disp_part = f"VIXEQ/VIX={vixeq_vix:.2f}" if vixeq_vix is not None else "离散比缺失"
+            if dspx is not None:
+                disp_part += f"（DSPX {dspx:.1f}）"
+            if pc_eq is not None and pc_tot is not None and pc_idx is not None:
+                pc_part = f"CBOE 个股/全市场/指数 P/C 为 {pc_eq:.2f} / {pc_tot:.2f} / {pc_idx:.2f}"
+            else:
+                pc_part = "当日 CBOE Put/Call 统计缺失"
+            drivers.append(f"离散与期权流量：{disp_part}；{pc_part}。")
+
+        has_dealer = spx_gex is not None and dealer_g is not None
+        if has_dealer:
+            flip_part = ""
+            if spx is not None and gamma_flip is not None:
+                diff = spx - gamma_flip
+                pos = "低于" if diff < 0 else "高于"
+                flip_part = f"SPX 现价{pos} Gamma Flip({gamma_flip:.1f}) {abs(diff):.0f} 点，"
+            nd_part = f"、Net Delta 流 {net_delta:+.1f}$B" if net_delta is not None else ""
+            zone = "负 Gamma 加速区" if dealer_g < 0 else "正 Gamma 阻尼区"
+            drivers.append(
+                f"做市商敞口（期权链自算）：{flip_part}SPX GEX {spx_gex:+.1f}$B、"
+                f"Dealer Gamma {dealer_g:+.2f}$B{nd_part}，处于{zone}。"
+            )
+        else:
+            drivers.append(
+                "口径说明：该日为免费历史回填日，不含 SPX 期权链做市商分项，压力分按 70 分非做市商维度归一化。"
+            )
+
+        if newly_triggered:
+            drivers.append(f"新增触发红线：{'、'.join(newly_triggered)}。")
+        if cleared_lines:
+            drivers.append(f"较前日解除红线：{'、'.join(cleared_lines)}。")
+
+        # 3) 下一交易日核心观察拐点（WatchNext）
+        if stage == 1:
+            watch_next = "稳态观察：盯 SKEW 是否冲上 160 及个股 P/C 是否率先抬头突破 0.68（先遣预警信号）。"
+        elif stage == 2:
+            watch_next = "临界观察：盯 VIX 是否突破 26~28、VIX/VIX3M 是否倒挂破 1.00，以及标普是否跌破 Gamma Flip 触发负反馈。"
+        elif stage == 3:
+            if regime["macroDefense"]:
+                watch_next = (
+                    "高危防踩踏：已触及宏观全面防御/底线区，切勿盲目接飞刀；"
+                    "止跌确认重点盯 VVIX 回落至 110 下方 + 期限倒挂解除（VIX/VIX3M < 1.00）+ Net Delta 回正。"
+                )
+            else:
+                watch_next = (
+                    "双向拐点：向上升级风险盯「指数 P/C 站稳 1.25 / 个股 P/C 破 0.80 / Dealer Gamma 击穿 -8.6B」；"
+                    "向下止跌修复盯「VVIX 跌回 110 下方 + VIX/VIX3M 回到 1.00 以下」。"
+                )
+        else:
+            watch_next = "修复观察：盯 VIX 能否稳步回落至 20 以下、SPX GEX 能否重返零轴上方切回正 Gamma 阻尼区。"
+
+        entries_asc.append(
+            {
+                "date": rec["date"],
+                "stage": stage,
+                "stageTitle": regime["title"],
+                "color": regime["color"],
+                "macroDefense": regime["macroDefense"],
+                "stageChanged": stage_changed,
+                "prevStage": prev_stage,
+                "streakDays": streak,
+                "stressScore": stress,
+                "stressDelta": stress_delta,
+                "stressPartial": bool(rec.get("stressPartial", not has_dealer)),
+                "hasDealerData": has_dealer,
+                "headline": headline,
+                "drivers": drivers,
+                "watchNext": watch_next,
+                "redLines": red_lines,
+                "newlyTriggered": newly_triggered,
+                "clearedRedLines": cleared_lines,
+                "metrics": {
+                    "spx": spx,
+                    "spxChgPct": spx_chg_pct,
+                    "nvda": rec.get("nvda"),
+                    "vix": vix,
+                    "vvix": vvix,
+                    "vixVxv": vix_vxv,
+                    "vix9dVix": vix9d_vix,
+                    "vixeqVix": vixeq_vix,
+                    "dspx": dspx,
+                    "skew": rec.get("skew"),
+                    "pcEquity": pc_eq,
+                    "pcTotal": pc_tot,
+                    "pcIndex": pc_idx,
+                    "spxGex": spx_gex,
+                    "dealerGamma": dealer_g,
+                    "netDelta": net_delta,
+                    "gammaFlip": gamma_flip,
+                },
+                "verification": {
+                    "spxRet1d": spx_ret_1d,
+                    "spxRet5d": spx_ret_5d,
+                },
+            }
+        )
+
+    return list(reversed(entries_asc))
+
+
 # ---------------------------------------------------------------------------
 # 4. 主编排流程：拉取、对齐、合并历史并落盘
 # ---------------------------------------------------------------------------
@@ -902,14 +1144,23 @@ def main() -> int:
     final_stress, final_partial = compute_stress_index(latest_row)
     final_regime = detect_regime(latest_row)
 
+    # 7. 生成每日自动判断记录（docs/data/journal.json）与今日简报（嵌入 latest.json）
+    journal_entries = build_journal_entries(history_records)
+    daily_brief = journal_entries[0] if journal_entries else None
+
+    stage_counts = {str(st): sum(1 for e in journal_entries if e["stage"] == st) for st in (1, 2, 3, 4)}
+    transition_count = sum(1 for e in journal_entries if e["stageChanged"])
+    full_chain_count = sum(1 for e in journal_entries if e["hasDealerData"])
+
     latest_payload = {
-        "schemaVersion": "1.0.0",
+        "schemaVersion": "1.1.0",
         "asOfDate": as_of_date,
         "fetchedAtUtc": fetched_at_utc,
         "spxSpot": latest_row.get("spx"),
         "stressScore": final_stress,
         "stressPartial": final_partial,
         "regime": final_regime,
+        "dailyBrief": daily_brief,
         "values": {
             "vixeqVix": latest_row.get("vixeqVix"),
             "dspx": latest_row.get("dspx"),
@@ -946,18 +1197,35 @@ def main() -> int:
     }
 
     history_payload = {
-        "schemaVersion": "1.0.0",
+        "schemaVersion": "1.1.0",
         "updatedAtUtc": fetched_at_utc,
         "latestDate": as_of_date,
         "count": len(history_records),
         "records": history_records,
     }
 
+    journal_payload = {
+        "schemaVersion": "1.1.0",
+        "updatedAtUtc": fetched_at_utc,
+        "latestDate": as_of_date,
+        "stats": {
+            "totalDays": len(journal_entries),
+            "stageCounts": stage_counts,
+            "transitionCount": transition_count,
+            "fullChainDays": full_chain_count,
+        },
+        "entries": journal_entries,
+    }
+
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     LATEST_PATH.write_text(json.dumps(latest_payload, ensure_ascii=False, indent=2), encoding="utf-8")
     HISTORY_PATH.write_text(json.dumps(history_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    JOURNAL_PATH.write_text(json.dumps(journal_payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    log(f"Saved {LATEST_PATH} and {HISTORY_PATH} ({len(history_records)} trading days, {len(gaps)} gap(s)).")
+    log(
+        f"Saved {LATEST_PATH.name}, {HISTORY_PATH.name}, {JOURNAL_PATH.name} "
+        f"({len(history_records)} trading days, {transition_count} transitions, {len(gaps)} gap(s))."
+    )
     log(f"Summary -> asOf={as_of_date}, Stress={final_stress}/100, Stage={final_regime['stage']} ({final_regime['title']})")
     return 0
 

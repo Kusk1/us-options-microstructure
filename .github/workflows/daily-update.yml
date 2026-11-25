@@ -2,8 +2,8 @@ name: Daily OpenBB Options Microstructure Update
 
 on:
   schedule:
-    # 周一至周五美股收盘后自动运行（UTC 22:30 = 美东夏令时 18:30 / 冬令时 17:30 = 北京时间次日 06:30）
-    - cron: "30 22 * * 1-5"
+    # 周一至周五美股收盘后自动运行（UTC 23:00 = 美东冬令时 18:00 / 夏令时 19:00 = 北京时间次日 07:00，确保 CBOE 日终统计已出表）
+    - cron: "0 23 * * 1-5"
   workflow_dispatch:
     inputs:
       backfill_days:
@@ -54,16 +54,19 @@ jobs:
           import json, pathlib
           latest = json.loads(pathlib.Path('docs/data/latest.json').read_text(encoding='utf-8'))
           hist = json.loads(pathlib.Path('docs/data/history.json').read_text(encoding='utf-8'))
+          journal = json.loads(pathlib.Path('docs/data/journal.json').read_text(encoding='utf-8'))
           assert latest.get('asOfDate'), 'Missing asOfDate in latest.json'
+          assert latest.get('dailyBrief'), 'Missing dailyBrief in latest.json'
           assert hist.get('count', 0) > 0, 'Empty history.json'
-          print(f\"Validated latest.json (asOf={latest['asOfDate']}, stress={latest['stressScore']}) and history.json ({hist['count']} days)\")
+          assert len(journal.get('entries', [])) > 0, 'Empty journal.json'
+          print(f\"Validated latest.json (asOf={latest['asOfDate']}, stress={latest['stressScore']}), history.json ({hist['count']}d), journal.json ({len(journal['entries'])} entries)\")
           "
 
       - name: Commit and push updated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/latest.json docs/data/history.json
+          git add docs/data/latest.json docs/data/history.json docs/data/journal.json
           if git diff --staged --quiet; then
             echo "No data changes to commit."
           else

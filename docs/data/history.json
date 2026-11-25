@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "1.0.0",
-  "updatedAtUtc": "2026-11-24T13:10:54Z",
-  "latestDate": "2026-11-23",
-  "count": 90,
+  "schemaVersion": "1.1.0",
+  "updatedAtUtc": "2026-11-25T02:36:25Z",
+  "latestDate": "2026-11-24",
+  "count": 91,
   "records": [
     {
       "date": "2026-07-20",
@@ -2252,6 +2252,31 @@
       "gammaFlip": 7400.6,
       "stressScore": 60,
       "stressPartial": false,
+      "stage": 3
+    },
+    {
+      "date": "2026-11-24",
+      "vixeqVix": 1.86,
+      "vixeq": 49.09,
+      "dspx": 42.64,
+      "nvda": 155.38,
+      "spx": 7201.09,
+      "vix": 26.36,
+      "vvix": 114.07,
+      "vix9d": 26.68,
+      "vix3m": 25.47,
+      "vixVxv": 1.035,
+      "vix9dVix": 1.012,
+      "skew": 139.16,
+      "pcEquity": null,
+      "pcTotal": null,
+      "pcIndex": null,
+      "spxGex": -72.92,
+      "dealerGamma": -10.13,
+      "netDelta": -43.64,
+      "gammaFlip": 7436.4,
+      "stressScore": 68,
+      "stressPartial": true,
       "stage": 3
     }
   ]

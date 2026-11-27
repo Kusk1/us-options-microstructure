@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1.0",
-  "updatedAtUtc": "2026-11-26T04:41:54Z",
+  "updatedAtUtc": "2026-11-27T04:46:52Z",
   "latestDate": "2026-11-25",
   "count": 92,
   "records": [
@@ -2298,8 +2298,8 @@
       "pcIndex": 1.04,
       "spxGex": 0.02,
       "dealerGamma": 0.0,
-      "netDelta": 38.24,
-      "gammaFlip": 7419.7,
+      "netDelta": 48.68,
+      "gammaFlip": 7419.3,
       "stressScore": 43,
       "stressPartial": false,
       "stage": 3

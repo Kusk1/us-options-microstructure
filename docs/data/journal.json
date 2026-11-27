@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.1.0",
-  "updatedAtUtc": "2026-11-26T04:41:54Z",
+  "updatedAtUtc": "2026-11-27T04:46:52Z",
   "latestDate": "2026-11-25",
   "stats": {
     "totalDays": 92,
@@ -31,7 +31,7 @@
       "drivers": [
         "波动率与期限：VIX 28.29、VVIX 115.4，VIX/VIX3M=1.08（近远端倒挂）。",
         "离散与期权流量：VIXEQ/VIX=1.82（DSPX 43.2）；CBOE 个股/全市场/指数 P/C 为 0.64 / 0.98 / 1.04。",
-        "做市商敞口（期权链自算）：SPX 现价低于 Gamma Flip(7419.7) 237 点，SPX GEX +0.0$B、Dealer Gamma +0.00$B、Net Delta 流 +38.2$B，处于正 Gamma 阻尼区。",
+        "做市商敞口（期权链自算）：SPX 现价低于 Gamma Flip(7419.3) 237 点，SPX GEX +0.0$B、Dealer Gamma +0.00$B、Net Delta 流 +48.7$B，处于正 Gamma 阻尼区。",
         "新增触发红线：VIXEQ/VIX跌破1.85(离散崩塌)、VIX破28(Vanna触发)、VVIX破115(流动性挤兑)。",
         "较前日解除红线：Dealer Gamma击穿-8.6B底线、Net Delta持续卖出对冲、SPX GEX深度负值。"
       ],
@@ -69,8 +69,8 @@
         "pcIndex": 1.04,
         "spxGex": 0.02,
         "dealerGamma": 0.0,
-        "netDelta": 38.24,
-        "gammaFlip": 7419.7
+        "netDelta": 48.68,
+        "gammaFlip": 7419.3
       },
       "verification": {
         "spxRet1d": null,

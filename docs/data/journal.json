@@ -1,19 +1,74 @@
 {
   "schemaVersion": "1.1.0",
-  "updatedAtUtc": "2026-11-27T04:46:52Z",
-  "latestDate": "2026-11-25",
+  "updatedAtUtc": "2026-11-28T04:29:58Z",
+  "latestDate": "2026-11-27",
   "stats": {
-    "totalDays": 92,
+    "totalDays": 93,
     "stageCounts": {
       "1": 62,
-      "2": 24,
+      "2": 25,
       "3": 6,
       "4": 0
     },
-    "transitionCount": 14,
+    "transitionCount": 15,
     "fullChainDays": 3
   },
   "entries": [
+    {
+      "date": "2026-11-27",
+      "stage": 2,
+      "stageTitle": "阶段二：拥挤见顶与先遣撤退期",
+      "color": "amber",
+      "macroDefense": false,
+      "stageChanged": true,
+      "prevStage": 3,
+      "streakDays": 1,
+      "stressScore": 40,
+      "stressDelta": -3,
+      "stressPartial": true,
+      "hasDealerData": false,
+      "headline": "阶段拐点：由阶段三回落/切换至「阶段二：拥挤见顶与先遣撤退期」，综合压力 40/100（较前日 -3）。",
+      "drivers": [
+        "波动率与期限：VIX 23.81、VVIX 107.8，VIX/VIX3M=1.00（正常升水）。",
+        "离散与期权流量：VIXEQ/VIX=2.01（DSPX 41.4）；CBOE 个股/全市场/指数 P/C 为 0.58 / 0.83 / 1.08。",
+        "口径说明：该日为免费历史回填日，不含 SPX 期权链做市商分项，压力分按 70 分非做市商维度归一化。",
+        "较前日解除红线：VIX/VIX3M期限倒挂、VIXEQ/VIX跌破1.85(离散崩塌)、VIX破28(Vanna触发)、VVIX破115(流动性挤兑)。"
+      ],
+      "watchNext": "临界观察：盯 VIX 是否突破 26~28、VIX/VIX3M 是否倒挂破 1.00，以及标普是否跌破 Gamma Flip 触发负反馈。",
+      "redLines": [
+        "VIX9D/VIX超短端倒挂"
+      ],
+      "newlyTriggered": [],
+      "clearedRedLines": [
+        "VIX/VIX3M期限倒挂",
+        "VIXEQ/VIX跌破1.85(离散崩塌)",
+        "VIX破28(Vanna触发)",
+        "VVIX破115(流动性挤兑)"
+      ],
+      "metrics": {
+        "spx": 7297.49,
+        "spxChgPct": 1.6,
+        "nvda": 150.49,
+        "vix": 23.81,
+        "vvix": 107.84,
+        "vixVxv": 1.0,
+        "vix9dVix": 1.012,
+        "vixeqVix": 2.01,
+        "dspx": 41.35,
+        "skew": 145.9,
+        "pcEquity": 0.58,
+        "pcTotal": 0.83,
+        "pcIndex": 1.08,
+        "spxGex": null,
+        "dealerGamma": null,
+        "netDelta": null,
+        "gammaFlip": null
+      },
+      "verification": {
+        "spxRet1d": null,
+        "spxRet5d": null
+      }
+    },
     {
       "date": "2026-11-25",
       "stage": 3,
@@ -73,7 +128,7 @@
         "gammaFlip": 7419.3
       },
       "verification": {
-        "spxRet1d": null,
+        "spxRet1d": 1.6,
         "spxRet5d": null
       }
     },
@@ -309,7 +364,7 @@
       },
       "verification": {
         "spxRet1d": -3.7,
-        "spxRet5d": null
+        "spxRet5d": 1.7
       }
     },
     {
